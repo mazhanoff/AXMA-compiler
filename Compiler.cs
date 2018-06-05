@@ -184,10 +184,19 @@ namespace AXMA_compiler
         }
 
         private void playBtn_Click(object sender, EventArgs e)
-        {
-            StoryForm storyForm = new StoryForm(story);
-            storyForm.Show();
-            this.Hide();
+        {            
+            try
+            {
+                StoryForm storyForm = new StoryForm(story);
+                storyForm.Show();
+                storyForm.FormClosed += delegate { this.Show(); };
+                this.Hide();
+            }
+            catch (Exception ex)
+            {
+                this.Show();
+                logsRTB.AppendText(ex.Message+"\n");
+            }   
         }
     }
 
