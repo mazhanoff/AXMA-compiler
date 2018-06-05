@@ -1,0 +1,11 @@
+C:\Users\mazha\source\repos\AXMA compiler\bin\Debug\AXMA compiler.exe.config
+C:\Users\mazha\source\repos\AXMA compiler\bin\Debug\AXMA compiler.exe
+C:\Users\mazha\source\repos\AXMA compiler\bin\Debug\AXMA compiler.pdb
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.csprojResolveAssemblyReference.cache
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA_compiler.Properties.Resources.resources
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.csproj.GenerateResource.cache
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.csproj.CoreCompileInputs.cache
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.exe
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.pdb
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA_compiler.Compiler.resources
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA_compiler.StoryForm.resources
