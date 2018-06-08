@@ -9,3 +9,5 @@ C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.exe
 C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.pdb
 C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA_compiler.Compiler.resources
 C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA_compiler.StoryForm.resources
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\Interop.WMPLib.dll
+C:\Users\mazha\source\repos\AXMA compiler\obj\Debug\AXMA compiler.csproj.ResolveComReference.cache

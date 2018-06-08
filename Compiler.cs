@@ -117,7 +117,7 @@ namespace AXMA_compiler
                         {
                             if (cur.Substring(2, 4) == "File" || cur.Substring(2, 4) == "Файл")
                             {
-                                string path = cur.Substring(cur.IndexOf(':') + 2, cur.Length - (cur.IndexOf(':') + 1) - 2);
+                                string path = cur.Substring(cur.IndexOf(':') + 2, cur.Length - (cur.IndexOf(':') + 1) - 3);
                                 paragraph.Music = path;
                             }
                             else
