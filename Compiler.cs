@@ -21,6 +21,7 @@ namespace AXMA_compiler
     {
         private Dictionary<string, string> Gram = new Dictionary<string, string>();
         AXMA_Story story;
+        string path;
         public Compiler()
         {
             story = new AXMA_Story();
@@ -47,7 +48,7 @@ namespace AXMA_compiler
             openFileDialog1.Title = "Select a AXMA project";
 
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {                
+            {
                 System.IO.StreamReader sr = new System.IO.StreamReader(openFileDialog1.FileName);
                 try
                 {
@@ -56,7 +57,9 @@ namespace AXMA_compiler
                 }
                 catch (Exception ex)
                 {
-                    logsRTB.AppendText(ex.Message);
+                    logsRTB.AppendText(ex.Source + "\n");
+                    logsRTB.AppendText(ex.StackTrace + "\n");
+                    logsRTB.AppendText(ex.Message + "\n");
                 }
                 sr.Close();
             }
@@ -67,6 +70,7 @@ namespace AXMA_compiler
             States state = States.parHeader;
             string res = "";
             AXMA_Story.Paragraph paragraph = new AXMA_Story.Paragraph();
+            paragraph.Link = new List<string>();
             while (!sr.EndOfStream)
             {
                 var index = sr.GetPosition();
@@ -94,15 +98,15 @@ namespace AXMA_compiler
                             switch (paragraph.Name)
                             {
                                 case "StoryAuthor":
-                                    paragraph.Link = "SysParagraph";
+                                    paragraph.Link.Add("SysParagraph");
                                     story.Author = paragraph.Text;
                                     break;
                                 case "StoryTitle":
-                                    paragraph.Link = "SysParagraph";
+                                    paragraph.Link.Add("SysParagraph");
                                     story.Title = paragraph.Text;
                                     break;
                                 case "End":
-                                    paragraph.Link = "End";
+                                    paragraph.Link.Add("End");
                                     break;
                             }
                         }
@@ -140,23 +144,35 @@ namespace AXMA_compiler
                             state = States.parBody;                            
                         }
                         break;
-                    case States.parLink:
-                        string link = cur.Substring(2, cur.Length - 4);
-                        paragraph.Link = link;
-                        state = States.parEnd;
+                    case States.parLink:                        
+                        if (cur!="" && cur[0] == '[')
+                        {
+                            string link = cur.Substring(2, cur.Length - 4);
+                            paragraph.Link.Add(link);
+                            state = States.parLink;
+                        }
+                        else if (cur.Length == 0)
+                            break;
+                        else
+                        {
+                            sr.SetPosition(index);
+                            state = States.parEnd;
+                        }
+                        
                         break;
                     case States.parEnd:
                         sr.SetPosition(index);
                         story.Paragraphs.Add(paragraph);
                         paragraph.Name = null;
                         paragraph.Text = null;
-                        paragraph.Link = null;
+                        paragraph.Link = new List<string>();
                         paragraph.Image = null;
                         paragraph.Music = null;
                         state = States.parHeader;
                         break;
                 }
             }
+            story.Paragraphs.Add(paragraph);
             return res;
         }
 
@@ -168,15 +184,16 @@ namespace AXMA_compiler
                 logsRTB.AppendText("\nParagraph #" + ++count+"\n");
                 logsRTB.AppendText("Name: " + par.Name + "\n");
                 logsRTB.AppendText("Text: " + par.Text);
-                if (par.Link!=null)
-                    logsRTB.AppendText("Link: " + par.Link + "\n");
+                if (par.Link.Count!=0)
+                    foreach (var a in par.Link)
+                        logsRTB.AppendText("Link: " + a + "\n");
                 else
                     logsRTB.AppendText("Link: NULL\n");
                 if (par.Music != null)
                     logsRTB.AppendText("Music: " + par.Music + "\n" );
                 else
                     logsRTB.AppendText("Music: NULL\n");
-                if (par.Music != null)
+                if (par.Image != null)
                     logsRTB.AppendText("Image: " + par.Image + "\n");
                 else
                     logsRTB.AppendText("Image: NULL\n");
@@ -195,6 +212,8 @@ namespace AXMA_compiler
             catch (Exception ex)
             {
                 this.Show();
+                logsRTB.AppendText(ex.Source + "\n");
+                logsRTB.AppendText(ex.StackTrace + "\n");
                 logsRTB.AppendText(ex.Message+"\n");
             }   
         }

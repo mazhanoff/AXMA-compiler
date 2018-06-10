@@ -12,7 +12,7 @@ namespace AXMA_compiler
         {
             public string Name;
             public string Text;
-            public string Link;
+            public List<string> Link;
             public string Image;
             public string Music;
         }

@@ -16,8 +16,10 @@ namespace AXMA_compiler
     public partial class StoryForm : Form
     {
         AXMA_Story story;
-        Dictionary<string, int> links;
+        Dictionary<int, Dictionary<string,int>> links;
         int curParagraph;
+        int prevParagraph;
+        WMPLib.WindowsMediaPlayer player;
         public StoryForm()
         {
             InitializeComponent();
@@ -29,31 +31,42 @@ namespace AXMA_compiler
             story = str;
             createLinks();
             this.KeyUp += goNextParagraph;
+            this.FormClosing += closing;
             foreach (var par in story.Paragraphs)
             {
                 if (par.Name == "Start")
                 {
                     curParagraph = story.Paragraphs.IndexOf(par);
+                    prevParagraph = curParagraph;
                 }
             }
         }
 
-
+        private void closing(object sender, FormClosingEventArgs e)
+        {
+            player.close();
+        }
 
         private void createLinks()
         {
-            links = new Dictionary<string, int>();
-            foreach (var a in story.Paragraphs)
+            links = new Dictionary<int, Dictionary<string, int>>();
+            for (int i = 0; i < story.Paragraphs.Count; i++) 
             {
-                if (a.Link != null && a.Link != "SysParagraph")
+                var a = story.Paragraphs[i];
+                Dictionary<string, int> buffer = new Dictionary<string, int>();
+                if (a.Link.Count!=0 && a.Link.First() != "SysParagraph")                
                 {
-                    string link = a.Link.Substring(a.Link.IndexOf('|') + 1);
-                    for (int i = 0; i < story.Paragraphs.Count; i++)
+                    foreach(var b in a.Link)
                     {
-                        if (link == story.Paragraphs[i].Name)
-                            links.Add(link, i);
-                    }
+                        string _link = b.Substring(b.IndexOf('|') + 1).Trim();
+                        for (int j = 0; j < story.Paragraphs.Count; j++)
+                        {
+                            if (_link == story.Paragraphs[j].Name)
+                                buffer.Add(_link, j);
+                        }
+                    }                    
                 }
+                links.Add(i, buffer);
             }
         }
 
@@ -67,6 +80,7 @@ namespace AXMA_compiler
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
+            player.close();
             this.Close();
         }
 
@@ -96,54 +110,93 @@ namespace AXMA_compiler
                 this.Controls.Remove(title);
                 Render(curParagraph);
             };
-            myTimer.Interval = 3000;
+            myTimer.Interval = 1000;
             myTimer.Start();
 
         }
 
         private void Render(int curPar)
         {
-            textPanel.Visible = true;
+            prevParagraph = curParagraph;
+            tableLayout.Visible = true;
             var par = story.Paragraphs[curPar];
-
+            linkLayoutPanel.Controls.Clear();
+            linkLayoutPanel.ColumnCount = 1;
             backgroundImage.ImageLocation = par.Image;
             showText(par.Text);
+            showLinks(par.Link);
             curParagraph = story.Paragraphs.IndexOf(par);
-            WMPLib.WindowsMediaPlayer player = new WindowsMediaPlayer();
+            player = new WindowsMediaPlayer();
             player.URL = par.Music;
         }
 
+        private void showLinks(List<string> link)
+        {
+            foreach(var l in link)
+            {
+                string _l = "|   " + l.Substring(0, l.IndexOf('|')) + "   |";
+                Label text = new Label();
+                text.Name = "link";
+                text.Text = _l;
+                text.AutoEllipsis = true;
+                text.ForeColor = Color.Brown;
+                text.AutoSize = true;
+                text.Cursor = Cursors.Hand;
+                text.Font = new Font("Book Antiqua", 16, FontStyle.Bold);
+                text.Click += goNextParagraphByLink;
+                text.Anchor = (AnchorStyles.Left | AnchorStyles.Right);
+                linkLayoutPanel.Controls.Add(text,linkLayoutPanel.ColumnCount-1,0);
+                linkLayoutPanel.ColumnCount++;
+            }
+        }
+
+        
+
         private void showText(string _text)
         {
-            var a = textPanel.Controls.Find("text", true);
+            var a = tableLayout.Controls.Find("text", true);
             if (a.Length>0)
-                textPanel.Controls.Remove(a[0]);            
+                tableLayout.Controls.Remove(a[0]);            
             Label text = new Label();
             text.Name = "text";
             text.Text = _text;
             text.AutoEllipsis = true;
             text.ForeColor = Color.Black;
             text.AutoSize = true;
-            text.Font = new Font("Arial", 20, FontStyle.Regular);
-            textPanel.Controls.Add(text);
-            //text.BringToFront();
-            //text.Location = new Point(textPanel.Location.X + 25, textPanel.Location.Y + 25);
-
+            text.Font = new Font("Book Antiqua",16,FontStyle.Regular);
+            tableLayout.Controls.Add(text,0,0);
         }
 
+        private void goNextParagraphByLink(object sender, EventArgs e)
+        {
+            backBtn.Enabled = true;
+            Label s = sender as Label;
+            var n = linkLayoutPanel.Controls.IndexOf(s);
+            Render(links[curParagraph].ElementAt(n).Value);
+        }
         private void goNextParagraph(object sender, KeyEventArgs e)
         {
+            backBtn.Enabled = true;
             if (e.KeyCode == Keys.Space)
             {
-                string link = story.Paragraphs[curParagraph].Link?.Substring(story.Paragraphs[curParagraph].Link.IndexOf('|') + 1);
-                if (link != null)
+                if (story.Paragraphs[curParagraph].Link.Count == 1)
                 {
-                    int nextPar = links[link];
-                    Render(nextPar);
-                }
-                else
-                    this.Close();
+                    string link = story.Paragraphs[curParagraph].Link.First()?.Substring(story.Paragraphs[curParagraph].Link.First().IndexOf('|') + 1);
+                    if (link != null)
+                    {
+                        int nextPar = links[curParagraph][link];
+                        Render(nextPar);
+                    }
+                    else
+                        this.Close();
+                }                
             }
-        }        
+        }
+
+        private void backBtn_Click(object sender, EventArgs e)
+        {
+            Render(prevParagraph);
+            backBtn.Enabled = false;
+        }
     }
 }
