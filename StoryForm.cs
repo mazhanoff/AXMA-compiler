@@ -154,17 +154,19 @@ namespace AXMA_compiler
 
         private void showText(string _text)
         {
-            var a = tableLayout.Controls.Find("text", true);
-            if (a.Length>0)
-                tableLayout.Controls.Remove(a[0]);            
-            Label text = new Label();
-            text.Name = "text";
-            text.Text = _text;
-            text.AutoEllipsis = true;
-            text.ForeColor = Color.Black;
-            text.AutoSize = true;
-            text.Font = new Font("Book Antiqua",16,FontStyle.Regular);
-            tableLayout.Controls.Add(text,0,0);
+            textBox.Clear();
+            textBox.AppendText(_text);
+            //var a = tableLayout.Controls.Find("text", true);
+            //if (a.Length>0)
+            //    tableLayout.Controls.Remove(a[0]);            
+            //Label text = new Label();
+            //text.Name = "text";
+            //text.Text = _text;
+            //text.AutoEllipsis = true;
+            //text.ForeColor = Color.Black;
+            //text.AutoSize = true;
+            //text.Font = new Font("Book Antiqua",16,FontStyle.Regular);
+            //tableLayout.Controls.Add(text,0,0);
         }
 
         private void goNextParagraphByLink(object sender, EventArgs e)
